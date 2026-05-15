@@ -51,7 +51,7 @@ const ImportPage = () => {
 
   const columns = [
     { header: 'Date', accessor: 'createdAt', cell: (row) => new Date(row.createdAt).toLocaleString() },
-    { header: 'File Name', accessor: 'fileName' },
+    { header: 'File Name', accessor: 'file_name' },
     { header: 'Status', cell: (row) => (
       <span className="flex items-center">
         {row.status === 'completed' ? (
@@ -61,7 +61,7 @@ const ImportPage = () => {
         )}
       </span>
     )},
-    { header: 'Records Added', accessor: 'recordsAdded' },
+    { header: 'Records Added', accessor: 'imported_records' },
   ];
 
   return (

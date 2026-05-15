@@ -17,15 +17,15 @@ const getCompanies = async (req, res) => {
     const filters = {};
 
     if (req.query.city) {
-      filters.city = req.query.city;
+      filters.city = { $regex: req.query.city, $options: "i" };
     }
 
     if (req.query.state) {
-      filters.state = req.query.state;
+      filters.state = { $regex: req.query.state, $options: "i" };
     }
 
     if (req.query.industry) {
-      filters.industry = req.query.industry;
+      filters.industry = { $regex: req.query.industry, $options: "i" };
     }
 
     const companies = await Company.find(filters).populate("tags");

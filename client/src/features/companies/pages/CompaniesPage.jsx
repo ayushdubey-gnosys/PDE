@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Building2, Globe, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../../api/axios';
-import Table from '../../../components/ui/Table';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import CreateCompanyModal from '../components/CreateCompanyModal';
@@ -13,12 +13,13 @@ const fetchCompanies = async (searchParams) => {
   if (searchParams.industry) query.append('industry', searchParams.industry);
   if (searchParams.state) query.append('state', searchParams.state);
   
-  const url = query.toString() ? `/company/search?${query.toString()}` : '/company';
+  const url = query.toString() ? `/company?${query.toString()}` : '/company';
   const response = await api.get(url);
   return response.data.companies || response.data;
 };
 
 const CompaniesPage = () => {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState({ city: '', industry: '', state: '' });
   const [activeFilters, setActiveFilters] = useState({ city: '', industry: '', state: '' });
@@ -32,22 +33,6 @@ const CompaniesPage = () => {
     e.preventDefault();
     setActiveFilters(filters);
   };
-
-  const columns = [
-    { header: 'Name', accessor: 'name' },
-    { 
-      header: 'Website', 
-      cell: (row) => row.website ? (
-        <a href={row.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-          {row.website}
-        </a>
-      ) : '-'
-    },
-    { header: 'Industry', accessor: 'industry', cell: (row) => row.industry || '-' },
-    { header: 'City', accessor: 'city', cell: (row) => row.city || '-' },
-    { header: 'State', accessor: 'state', cell: (row) => row.state || '-' },
-    { header: 'Employees', accessor: 'employees', cell: (row) => row.employees || '-' },
-  ];
 
   return (
     <div className="space-y-6">
@@ -90,14 +75,52 @@ const CompaniesPage = () => {
         </form>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <Table
-          columns={columns}
-          data={companies}
-          isLoading={isLoading}
-          emptyMessage="No companies found."
-        />
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <p className="text-gray-500">Loading companies...</p>
+        </div>
+      ) : companies?.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center text-gray-500">
+          No companies found. Try adjusting your filters.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {companies?.map((company) => (
+            <div 
+              key={company._id}
+              onClick={() => navigate(`/companies/${company._id}`)}
+              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md hover:border-blue-200 transition-all duration-200 flex flex-col h-full group relative"
+            >
+              <div className="mb-4">
+                <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                  {company.company_name}
+                </h3>
+              </div>
+              
+              <div className="space-y-3 mt-auto flex-grow flex flex-col justify-end">
+                <div className="flex items-start text-sm text-gray-600">
+                  <Building2 className="w-4 h-4 mr-2 text-gray-400 shrink-0 mt-0.5" />
+                  <span className="truncate">{company.industry || 'N/A'}</span>
+                </div>
+                
+                <div className="flex items-start text-sm text-gray-600">
+                  <MapPin className="w-4 h-4 mr-2 text-gray-400 shrink-0 mt-0.5" />
+                  <span className="truncate">
+                    {[company.city, company.state].filter(Boolean).join(', ') || 'N/A'}
+                  </span>
+                </div>
+
+                <div className="flex items-start text-sm text-gray-600">
+                  <Globe className="w-4 h-4 mr-2 text-gray-400 shrink-0 mt-0.5" />
+                  <span className="truncate">
+                    {company.website ? company.website : 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <CreateCompanyModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>

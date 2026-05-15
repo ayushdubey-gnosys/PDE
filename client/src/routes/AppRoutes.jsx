@@ -8,6 +8,7 @@ import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
 import DashboardPage from '../features/dashboard/pages/DashboardPage';
 import CompaniesPage from '../features/companies/pages/CompaniesPage';
+import CompanyDetailsPage from '../features/companies/pages/CompanyDetailsPage';
 import ImportPage from '../features/import/pages/ImportPage';
 import ExportPage from '../features/export/pages/ExportPage';
 import TagsPage from '../features/tags/pages/TagsPage';
@@ -31,6 +32,7 @@ const AppRoutes = () => {
       >
         <Route index element={<DashboardPage />} />
         <Route path="companies" element={<CompaniesPage />} />
+        <Route path="companies/:id" element={<CompanyDetailsPage />} />
         <Route path="import" element={<ImportPage />} />
         <Route path="export" element={<ExportPage />} />
         <Route path="tags" element={<TagsPage />} />
